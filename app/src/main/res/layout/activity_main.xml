@@ -18,7 +18,7 @@
     android:layout_marginTop="32dp"
     android:text="@string/txt_titulo">
 
-</TextView>>
+</TextView>
 
     <ImageView
         android:layout_width="192dp"
@@ -44,8 +44,12 @@
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:textSize="48sp"
-        android:hint="Ejemplo: 6"
+        android:hint="@string/hint_edad"
         android:id="@+id/age_input"
+        android:inputType="number"
+        android:maxLength="2"
+        android:gravity="center"
+        android:importantForAutofill="no"
         />
 
  <TextView

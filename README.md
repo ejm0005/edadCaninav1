@@ -31,17 +31,23 @@ Al terminar sabrás:
 
 Antes de arreglar nada, comprueba qué falla. Prueba estas entradas y anota qué pasa:
 
-| Entrada | ¿Qué ocurre? |
-|---|---|
-| *(campo vacío)* | |
-| `abc` | |
-| `3.5` | |
-| `0` | |
-| `-4` | |
-| `99999999999` | |
-| `400000000` | |
+| Entrada | ¿Qué ocurre?                                  |
+|---|-----------------------------------------------|
+| *(campo vacío)* | Crashea la aplicación                         |
+| `abc` | Crashea la aplicación                         |
+| `3.5` | Crashea la aplicación                         |
+| `0` | El resultado es 0 años                        |
+| `-4` | El resultado es -28 años                      |
+| `99999999999` | Crashea la aplicación                         |
+| `400000000` | Sale un resultado negativo (-1494967296 años) |
 
-> 💡 Cuando la app se cierre, abre el **Logcat** y busca la excepción. ¿Qué método la lanza? ¿Por qué el último caso no cierra la app pero da un resultado absurdo?
+> 💡 Cuando la app se cierre, abre el **Logcat** y busca la excepción. ¿Qué método la lanza? ¿Por qué el último caso no cierra la app pero da un resultado absurdo?  
+> 
+> Integer.parseInt() que lanza java.lang.NumberFormatException.  
+> 
+> Porque a la hora de calcular el número por 7, el resultado excede el límite que soporta un int de 32 bits. Cuando dicho desbordamaiento ocurre, en lugar de lanzar una excepción, lo que ocurre es que el valor se da la vuelta comenzando por el principio del intervalo de valores que soporta un int de 32 bits, lo que dando como resultado un número negativo tan grande.
+
+
 
 ## Paso 2 · Crea la rama de trabajo
 
@@ -72,6 +78,10 @@ En `res/values/strings.xml` añade tres textos nuevos:
 ```
 
 > ❓ ¿Qué significan `%1$d` y `%2$d`? ¿En qué orden se rellenan?
+>
+> Son marcadores de posición que se utilizan para insertar valores dinámicos durante el tiempo de ejecución de un programa. El % indica el marcador de formato, el 1 con el $ indica el primer argumento que se introduce y 2$ el segundo y d indica que el tipo de dato esperado es en entero.  
+> 
+> %1$d se rellena con el primer argumento que se envía y %2$d con el segundo.
 
 ## Paso 5 · Restringe la entrada desde el layout
 
@@ -122,6 +132,8 @@ resultText = findViewById(R.id.result_text);
 ```
 
 > ❓ ¿Qué pasaría si dejaras `EditText ageEdit = findViewById(...)` dentro de `onCreate()`?
+>
+> La variable solo existiría dentro de este método, por lo que si se intenta acceder a ella desde calcularEdad() saldría un error de compilación
 
 ## Paso 8 · Saca la lógica del botón a un método
 
@@ -157,6 +169,9 @@ Implementa el método siguiendo este orden. En cuanto algo falle, llama a `mostr
 5. **Todo correcto**: quita el error del campo (`setError(null)`), calcula `age * FACTOR_CANINO` y muestra el resultado con `tu_edad_format`.
 
 > ❓ ¿Por qué limitar la edad a 30 evita también el desbordamiento que viste en el Paso 1?
+> 
+> Porque al limitar la edad máxima a 30, el cálculo máximo será 30*7=210, un valor extremadamente pequeño en comparación con el límite de int, por lo que  se evita correctamente el desbordamiento de memoria
+
 
 ## Paso 11 · Vuelve a probar
 
@@ -171,6 +186,8 @@ Comprueba que **la app nunca se cierra**:
 | `30` | "Si tu perro fuera humano tendría 210 años" |
 
 > 💡 Con el teclado numérico no puedes escribir `abc` ni `-4`. ¿Cómo comprobarías que el `try/catch` funciona? (Pista: quita `inputType` un momento.)
+> 
+> Eliminando la línea de android:inputType="number" del editText dentro del activity_main.xml. Luego ejecuto la aplicación y hago la pruebas correspondientes. En el caso de introducir letras, el programa mostrará un mensaje de que solo se aceptan números enteros y en el caso de introducir un número negativo, sale un mensaje indicando que inserte un número entre 1 y 30.
 
 ## Paso 12 · Guarda y sube tu trabajo
 
@@ -186,8 +203,8 @@ Comprueba en GitHub que tu fork tiene ahora dos ramas: `main` y `v2-validacion`.
 
 ## ✅ Lista de comprobación
 
-- [ ] La app no se cierra con ninguna entrada.
-- [ ] Todos los textos están en `strings.xml` (ningún aviso *Hardcoded string*).
-- [ ] No quedan números mágicos en `MainActivity`.
-- [ ] `onCreate()` solo prepara la pantalla; la lógica está en `calcularEdad()`.
-- [ ] El trabajo está en la rama `v2-validacion`, no en `main`.
+- ✅  La app no se cierra con ninguna entrada.
+- ✅  Todos los textos están en `strings.xml` (ningún aviso *Hardcoded string*).
+- ✅  No quedan números mágicos en `MainActivity`.
+- ✅  `onCreate()` solo prepara la pantalla; la lógica está en `calcularEdad()`.
+- ✅  El trabajo está en la rama `v2-validacion`, no en `main`.
