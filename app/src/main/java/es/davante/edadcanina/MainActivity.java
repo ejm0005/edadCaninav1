@@ -7,14 +7,14 @@ import androidx.databinding.DataBindingUtil;
 
 // Importar la clase binding que se ha generado
 import es.davante.edadcanina.databinding.ActivityMainBinding;
+import es.davante.edadcanina.modelo.EdadCaninaModelo;
+import es.davante.edadcanina.modelo.Validacion;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int FACTOR_CANINO = 7;
-    private static final int EDAD_MINIMA = 1;
-    private static final int EDAD_MAXIMA = 30;
-
     //Declarar el objeto binding
     private ActivityMainBinding binding;
+    //Declarar el objeto modelo
+    private EdadCaninaModelo modelo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,35 +23,39 @@ public class MainActivity extends AppCompatActivity {
 
         //Inicializar el binding sustituyendo al setContentView
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        //Inicializar el modelo
+        modelo = new EdadCaninaModelo();
 
-        //Binding directamente con el ID sustituyendo a findViewById
+        //Binding sustituyendo a findViewById
         binding.btnCalc.setOnClickListener(view -> calcularEdad());
     }
 
     private void calcularEdad() {
         String ageString = binding.ageInput.getText().toString().trim();
-        if (ageString.isEmpty()) {
-            mostrarError(getString(R.string.error_vacio));
-            return;
-        }
-        int age;
+        modelo.setEdadTexto(ageString);
 
-        try {
-            age = Integer.parseInt(ageString);
-        } catch (NumberFormatException e) {
-            mostrarError(getString(R.string.error_no_numero));
-            return;
-        }
+        //Validar y calcular según lo introducido en la aplicación
+        Validacion resultado = modelo.calcular();
 
-        if (age < EDAD_MINIMA || age > EDAD_MAXIMA) {
-            String mensajeRango = getString(R.string.error_rango, EDAD_MINIMA, EDAD_MAXIMA);
-            mostrarError(mensajeRango);
-            return;
+        //Mostrar según el resultado devuelto por el modelo
+        switch (resultado) {
+            case VACIO:
+                mostrarError(getString(R.string.error_vacio));
+                break;
+            case NO_ES_NUMERO:
+                mostrarError(getString(R.string.error_no_numero));
+                break;
+            case FUERA_DE_RANGO:
+                String mensajeRango = getString(R.string.error_rango, 1, 30);
+                mostrarError(mensajeRango);
+                break;
+            case CORRECTO:
+                binding.ageInput.setError(null);
+                binding.resultText.setText(getString(R.string.tu_edad_format, modelo.getEdadHumana()));
+                break;
+            case SIN_CALCULAR:
+                break;
         }
-
-        binding.ageInput.setError(null);
-        int dogAge = age * FACTOR_CANINO;
-        binding.resultText.setText(getString(R.string.tu_edad_format, dogAge));
     }
 
     private void mostrarError(String mensaje) {
